@@ -19,7 +19,7 @@ typedef struct {
     unsigned short col;
 } terminal_size_t;
 
-int get_terminal_size(terminal_size_t *ts);
+extern int get_terminal_size(terminal_size_t *ts);
 void print_terminal_size(const terminal_size_t *ts);
 
 
