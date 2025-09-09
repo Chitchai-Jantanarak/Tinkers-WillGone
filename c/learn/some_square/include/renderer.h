@@ -3,7 +3,7 @@
 
 typedef struct Renderer Renderer;
 
-Renderer* renderer_create(int cols, int rows);
+Renderer* renderer_create(int rows, int cols);
 void      renderer_destroy(Renderer* r);
 void      renderer_clear(Renderer* r, char fill);
 void      renderer_plot(Renderer* r, int x, int y, float z, char c);

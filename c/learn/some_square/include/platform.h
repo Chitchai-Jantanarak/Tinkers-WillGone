@@ -7,7 +7,7 @@ void platform_hide_cursor(void);
 void platform_show_cursor(void);
 void platform_clear_screen(void);
 
-void platform_sleep(int ms);
-unsigned long long platform_now(void);
+void platform_sleep_ms(int ms);
+unsigned long long platform_now_ms(void);
 
 #endif

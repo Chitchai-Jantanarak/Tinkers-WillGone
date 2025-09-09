@@ -7,7 +7,8 @@ typedef struct { float m[16]; }      Mat4;
 
 Vec3 vec3(float x, float y, float z);
 Vec4 vec4(float x, float y, float z, float w);
-Mat4 mat4_identify(void);
+
+Mat4 mat4_identity(void);
 
 Mat4 mat4_rx(float a);
 Mat4 mat4_ry(float a);

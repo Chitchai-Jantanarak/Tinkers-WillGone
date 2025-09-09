@@ -1,8 +1,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#pragma once
-#include "mesh.h"
+#include "math3d.h"
 
 // Using Lambert
 typedef struct {
