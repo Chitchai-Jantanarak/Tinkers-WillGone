@@ -1,0 +1,8 @@
+*.png
+*.pdf
+*.file
+/File
+
+mnt/data/png
+mnt/data/png/*
+mnt/data/raw/*
