@@ -1,35 +1,34 @@
+from pathlib import Path
+from PIL import Image
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
-from PIL import Image
 import io
 import os
+import sys
 
-base_dir    = os.path.dirname(os.path.abspath(__file__))  
-raw_dir     = os.path.join(base_dir, "mnt", "data", "raw") 
-png_dir     = os.path.join(base_dir, "mnt", "data", "png") 
-output_dir  = os.path.join(base_dir, "mnt", "data")  
+RAW_DIR = Path("/mnt/data/raw")
+PNG_DIR = Path("/mnt/data/png")
+OUTPUT_DIR = Path("/mnt/data")
+PNG_DIR.mkdir(parents=True, exist_ok=True)
 
-os.makedirs(png_dir, exist_ok=True)
+print("Finding target file ...")
+if not RAW_DIR.exists():
+    print(f"Error: '{RAW_DIR}' directory not found")
+    print("---- FALLBACK ----")
+    print(f"Creating the '{RAW_DIR}' directory...")
+    RAW_DIR.mkdir(parents=True, exist_ok=True)
+    print(f"Directory '{RAW_DIR}' created. ADD raw files here")
 
-print(f"Finding target file ...")
-if not os.path.exists(raw_dir):
-    print(f"Error: '{raw_dir}' directory not found")
-    print(f"---- FALLBACK ----")
-    print(f"Creating the '{raw_dir}' directory...")
-    os.makedirs(raw_dir, exist_ok=True)
-    print(f"Directory '{raw_dir}' created. ADD raw files here")
-
-files = [os.path.join(raw_dir, f) for f in os.listdir(raw_dir) if os.path.isfile(os.path.join(raw_dir, f))]
-
+files = [p for p in RAW_DIR.iterdir() if p.is_file()]
 if not files:
-    print(f"No files found in '{raw_dir}'")
-    exit(1)
+    print(f"No files found in '{RAW_DIR}'")
+    sys.exit(1)
 
-pdf_file = os.path.join(output_dir, "output.pdf")
-c = canvas.Canvas(pdf_file, pagesize=A4)
+pdf_file = OUTPUT_DIR / "output.pdf"
+c = canvas.Canvas(str(pdf_file), pagesize=A4)
 
 print("Working in:", os.getcwd())
-print(f"Found {len(files)} file(s) in '{raw_dir}' to process.")
+print(f"Found {len(files)} file(s) in '{RAW_DIR}' to process.")
 
 for file in files:
     with open(file, "rb") as f:
@@ -37,7 +36,14 @@ for file in files:
 
     image = Image.open(io.BytesIO(blob_data))
 
-    temp_file = os.path.join(png_dir, os.path.basename(file) + ".png")
+    try:
+        image = ImageOps.exif_transpose(image)
+    except Exception:
+        pass
+    if image.mode in ("RGBA", "P"):
+        image = image.convert("RGB")
+
+    temp_file = PNG_DIR / (file.name + ".png")
     image.save(temp_file)
 
     iw, ih = image.size
@@ -48,7 +54,7 @@ for file in files:
     x = (pw - new_w) / 2
     y = (ph - new_h) / 2
 
-    c.drawImage(temp_file, x, y, width=new_w, height=new_h)
+    c.drawImage(str(temp_file), x, y, width=new_w, height=new_h)
     c.showPage()
 
 c.save()
