@@ -11,9 +11,9 @@ int get_terminal_size(terminal_size_t *ts) {
 
     if (!GetConsoleScreenBufferInfo(hStdout, &csbi)) return -1;
     
-    // refers to _SMALL_RECT coords
-    ts -> row = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-    ts -> col = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+    // Fixed: row/col assignment was swapped
+    ts->col = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+    ts->row = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
 
     return 0;
 }
@@ -29,12 +29,13 @@ int get_terminal_size(terminal_size_t *ts) {
         return -1;
     } 
 
-    ts -> row = ws.ws_row;
-    ts -> col = ws.ws_col;
+    ts->row = ws.ws_row;
+    ts->col = ws.ws_col;
+    
+    return 0; // Fixed: missing return statement
 }
 
 #endif
-
 
 void print_terminal_size(const terminal_size_t *ts) {
     if (!ts) return;

@@ -1,10 +1,16 @@
 #include "math3d.h"
 #include <math.h>
 
-// Initators
-Vec3 vec3(float x, float y, float z) { return (Vec3){ x, y, z }; }
-Vec4 vec4(float x, float y, float z, float w ) { return (Vec4){ x, y, z, w}; }
-Mat4 mat4_identify(void) { 
+// Initializers
+Vec3 vec3(float x, float y, float z) { 
+    return (Vec3){ x, y, z }; 
+}
+
+Vec4 vec4(float x, float y, float z, float w) { 
+    return (Vec4){ x, y, z, w}; 
+}
+
+Mat4 mat4_identity(void) { 
     return (Mat4){ .m = {
         1, 0, 0, 0,
         0, 1, 0, 0, 
@@ -12,7 +18,6 @@ Mat4 mat4_identify(void) {
         0, 0, 0, 1
     }};
 }
-
 
 Mat4 mat4_mul(Mat4 A, Mat4 B) {
     Mat4 R = { 0 };
@@ -23,7 +28,6 @@ Mat4 mat4_mul(Mat4 A, Mat4 B) {
             }
         }
     }
-
     return R;
 }
 
@@ -32,7 +36,7 @@ Vec4 vec4_mul(Vec4 v, Mat4* restrict M) {
     const float y = v.y;
     const float z = v.z;
     const float w = v.w;
-    const float* restrict m = M -> m;
+    const float* restrict m = M->m;
 
     Vec4 r;
     r.x = x*m[0] + y*m[1] + z*m[2]  + w*m[3];
@@ -42,7 +46,6 @@ Vec4 vec4_mul(Vec4 v, Mat4* restrict M) {
 
     return r;
 }
-
 
 Mat4 mat4_rx(float a) {
     float c = cosf(a);
@@ -76,7 +79,6 @@ Mat4 mat4_rz(float a) {
         0,  0,  0,  1
     }};
 }
-
 
 Mat4 mat4_perspective(
     float fovy_rad, 

@@ -2,13 +2,41 @@
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
+#include <conio.h>
+
+static DWORD oldConsoleMode = 0;
+static HANDLE hConsoleInput = NULL;
 
 void platform_enter_raw(void) {
-    // !not_implemented
+    hConsoleInput = GetStdHandle(STD_INPUT_HANDLE);
+    GetConsoleMode(hConsoleInput, &oldConsoleMode);
+    SetConsoleMode(hConsoleInput, oldConsoleMode & ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT));
 }
 
 void platform_leave_raw(void) {
-    // !not_implemented
+    if (hConsoleInput) {
+        SetConsoleMode(hConsoleInput, oldConsoleMode);
+    }
+}
+
+void platform_hide_cursor(void) {
+    CONSOLE_CURSOR_INFO cursorInfo;
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    GetConsoleCursorInfo(hConsole, &cursorInfo);
+    cursorInfo.bVisible = FALSE;
+    SetConsoleCursorInfo(hConsole, &cursorInfo);
+}
+
+void platform_show_cursor(void) {
+    CONSOLE_CURSOR_INFO cursorInfo;
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    GetConsoleCursorInfo(hConsole, &cursorInfo);
+    cursorInfo.bVisible = TRUE;
+    SetConsoleCursorInfo(hConsole, &cursorInfo);
+}
+
+void platform_clear_screen(void) {
+    system("cls");
 }
 
 void platform_sleep_ms(int ms) {
@@ -38,9 +66,9 @@ void platform_enter_raw(void) {
     tcgetattr(STDIN_FILENO, &oldt);
     t = oldt;
     t.c_lflag     &= ~( ICANON | ECHO );
-    t.c_cc[VMIN]  = 0
-    t.c_cc[VTIME] = 0
-    tcgetattr(STDIN_FILENO, TCSANOW, &t);
+    t.c_cc[VMIN]  = 0;
+    t.c_cc[VTIME] = 0;
+    tcsetattr(STDIN_FILENO, TCSANOW, &t);
     raw_active = 1;
 }
 
@@ -54,7 +82,6 @@ void platform_leave_raw(void) {
 void platform_hide_cursor(void)  { fputs("\x1b[?25l", stdout); fflush(stdout); }
 void platform_show_cursor(void)  { fputs("\x1b[?25h", stdout); fflush(stdout); }
 void platform_clear_screen(void) { fputs("\x1b[2J\x1b[H", stdout); fflush(stdout); }
-
 
 void platform_sleep_ms(int ms) {
     struct timespec ts = {
